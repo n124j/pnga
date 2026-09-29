@@ -3,6 +3,7 @@
 // changes on the next page load. If the sheet cannot be reached, the copy saved
 // at build time (data/generated/snapshot.json) is shown instead.
 import { useEffect, useState } from 'react';
+import { BIOS } from '../data/boardBios';
 import snapshot from '../data/generated/snapshot.json';
 import { GALLERY_IMAGES, type GalleryImage } from '../data/gallery';
 import { EVENTS, type CommunityEvent } from '../data/events';
@@ -184,10 +185,24 @@ export interface BoardSection {
   title: string;
   /** Group is shown under "Past boards" (its name contains past, earlier or former). */
   past: boolean;
-  people: { role: string; name: string }[];
+  people: BoardPerson[];
+}
+
+export interface BoardPerson {
+  role: string;
+  name: string;
+  /** Short biography, paragraphs separated by line breaks. */
+  bio?: string;
+  /** Picture address (Google Drive link or /images path already converted for display). */
+  photo?: string;
 }
 
 /** Groups people by the "Group" column, in the order groups first appear in the sheet. */
+/** Spelling-tolerant key so "Keshab Bhandari" and "Roshan Shimkhada" still find the built-in bios. */
+const nameKey = (n: string) =>
+  n.toLowerCase().replace(/\b(dr|mr|mrs|ms)\b\.?/g, '').replace(/[^a-z]/g, '').replace(/sh/g, 's').replace(/v/g, 'b').replace(/(.)\1+/g, '$1');
+const BIO_BY_KEY = new Map(Object.entries(BIOS).map(([n, b]) => [nameKey(n), b]));
+
 export function parseBoard(csv: string): BoardSection[] {
   const sections: BoardSection[] = [];
   for (const o of toObjects(csv)) {
@@ -200,12 +215,13 @@ export function parseBoard(csv: string): BoardSection[] {
       sec = { title, past: /\b(past|earlier|former|previous)\b/i.test(title), people: [] };
       sections.push(sec);
     }
-    sec.people.push({ role: (o.role ?? '').trim(), name });
+    // A Bio typed in the sheet wins; if the cell is empty, the built-in bio for that name is used so links never vanish.
+    sec.people.push({ role: (o.role ?? '').trim(), name, bio: (o.bio ?? '').trim() || BIO_BY_KEY.get(nameKey(name)) || undefined, photo: driveImageUrl(o.photo ?? '') || undefined });
   }
   return sections;
 }
 
-const rows = (group: string, list: { role: string; name: string }[]) => ({ title: group, past: /past|earlier/i.test(group), people: list });
+const rows = (group: string, list: BoardPerson[]) => ({ title: group, past: /past|earlier/i.test(group), people: list });
 const names = (group: string, list: string[]) => rows(group, list.map((name) => ({ role: '', name })));
 
 /** Built-in board, used until the board sheet is set up. */

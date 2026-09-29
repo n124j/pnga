@@ -2,9 +2,13 @@
 // Only names and titles are published. Personal phone numbers, emails and LinkedIn
 // links from that list are deliberately NOT shown on the public site.
 
+import { BIOS } from './boardBios';
+
+const withBio = (r: { role: string; name: string }) => ({ ...r, bio: BIOS[r.name] });
+
 export const CURRENT_BOARD = [
   { role: 'President', name: 'Navaraj Dhakal' },
-  { role: 'Vice President', name: 'Dr. Keshab Bhandari' },
+  { role: 'Vice President', name: 'Dr. Keshav Bhandari' },
   { role: 'Executive Director (pro bono)', name: 'Rajju Malla Dhakal' },
   { role: 'Secretary', name: 'Dhana Prakash Lama' },
   { role: 'Treasurer', name: 'Robin Pakhrin' },
@@ -13,8 +17,8 @@ export const CURRENT_BOARD = [
   { role: 'Member', name: 'Hemanta / Bishnu' },
   { role: 'Member', name: 'Garbhi Lal Yadav' },
   { role: 'Member', name: 'Ramesh Ghising' },
-  { role: 'Member', name: 'Roshan Shimkhada' },
-];
+  { role: 'Member', name: 'Roshan Simkhada' },
+].map(withBio);
 
 export const SENIOR_ADVISORS = ['Binod Moktan'];
 
