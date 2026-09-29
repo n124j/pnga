@@ -1,6 +1,7 @@
 // Runs after `vite-react-ssg build`. Writes sitemap.xml and robots.txt into dist/
 // using the pages that were actually built, so they can never drift out of date.
-import { copyFileSync, readdirSync, readFileSync, statSync, writeFileSync, existsSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 
 const dist = 'dist';
@@ -30,10 +31,37 @@ function findPages(dir, base = '') {
   return pages;
 }
 
+// The site's security policy (public/_headers) only allows scripts that come from the site itself,
+// so the small inline scripts the static build puts in every page are moved into files. Same code,
+// same order, no need to weaken the policy.
+function externalizeInlineScripts(dir) {
+  let count = 0;
+  const walk = (d) => {
+    for (const name of readdirSync(d)) {
+      const full = join(d, name);
+      if (statSync(full).isDirectory()) { walk(full); continue; }
+      if (!name.endsWith('.html')) continue;
+      const html = readFileSync(full, 'utf8');
+      const out = html.replace(/<script(?![^>]*\bsrc=)(?![^>]*type="application\/ld\+json")([^>]*)>([\s\S]*?)<\/script>/g, (m, attrs, code) => {
+        if (!code.trim()) return m;
+        const id = createHash('sha256').update(code).digest('hex').slice(0, 16);
+        mkdirSync(join(dir, '_inline'), { recursive: true });
+        writeFileSync(join(dir, '_inline', `${id}.js`), code);
+        count++;
+        return `<script${attrs} src="/_inline/${id}.js"></script>`;
+      });
+      if (out !== html) writeFileSync(full, out);
+    }
+  };
+  walk(dir);
+  return count;
+}
+
 const env = readEnv();
 const siteUrl = (env.VITE_SITE_URL || '').trim().replace(/\/+$/, '');
 // Static hosts (Cloudflare Pages, Netlify) show /404.html for unknown addresses.
 if (existsSync(join(dist, '404', 'index.html'))) copyFileSync(join(dist, '404', 'index.html'), join(dist, '404.html'));
+console.log(`[postbuild] moved ${externalizeInlineScripts(dist)} inline scripts into /_inline files`);
 const pages = findPages(dist).filter((p) => p !== '/404').sort();
 
 if (!siteUrl) {
