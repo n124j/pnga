@@ -19,10 +19,10 @@ function readEnv() {
 }
 
 const env = readEnv();
-let snap = { news: '', gallery: '', events: '', board: '', programs: '' };
+let snap = { news: '', gallery: '', events: '', board: '', programs: '', hero: '' };
 try { snap = { ...snap, ...JSON.parse(readFileSync(out, 'utf8')) }; } catch { /* first run */ }
 
-for (const [key, envName] of [['news', 'VITE_NEWS_CSV_URL'], ['gallery', 'VITE_GALLERY_CSV_URL'], ['events', 'VITE_EVENTS_CSV_URL'], ['board', 'VITE_BOARD_CSV_URL'], ['programs', 'VITE_PROGRAMS_CSV_URL']]) {
+for (const [key, envName] of [['news', 'VITE_NEWS_CSV_URL'], ['gallery', 'VITE_GALLERY_CSV_URL'], ['events', 'VITE_EVENTS_CSV_URL'], ['board', 'VITE_BOARD_CSV_URL'], ['programs', 'VITE_PROGRAMS_CSV_URL'], ['hero', 'VITE_HERO_CSV_URL']]) {
   const url = env[envName];
   if (!url) { snap[key] = ''; console.log(`fetch-content: ${envName} not set, ${key} snapshot left empty`); continue; }
   try {

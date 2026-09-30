@@ -1,4 +1,4 @@
-// Reads community-editable content (news, gallery) from Google Sheets that are
+// Reads community-editable content (news, gallery, home slideshow and more) from Google Sheets that are
 // "Published to the web" as CSV. Volunteers edit the sheet; the site picks up
 // changes on the next page load. If the sheet cannot be reached, the copy saved
 // at build time (data/generated/snapshot.json) is shown instead.
@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { BIOS } from '../data/boardBios';
 import snapshot from '../data/generated/snapshot.json';
 import { GALLERY_IMAGES, type GalleryImage } from '../data/gallery';
+import { HERO_SLIDES, type HeroSlide } from '../data/hero';
 import { EVENTS, type CommunityEvent } from '../data/events';
 import { PROGRAMS, type Program, type ProgramSection } from '../data/programs';
 import {
@@ -17,6 +18,7 @@ export const GALLERY_CSV_URL: string = import.meta.env.VITE_GALLERY_CSV_URL ?? '
 export const EVENTS_CSV_URL: string = import.meta.env.VITE_EVENTS_CSV_URL ?? '';
 export const PROGRAMS_CSV_URL: string = import.meta.env.VITE_PROGRAMS_CSV_URL ?? '';
 export const BOARD_CSV_URL: string = import.meta.env.VITE_BOARD_CSV_URL ?? '';
+export const HERO_CSV_URL: string = import.meta.env.VITE_HERO_CSV_URL ?? '';
 
 /** Small RFC 4180 CSV parser (quoted fields, escaped quotes, newlines in cells). */
 export function parseCsv(text: string): string[][] {
@@ -138,6 +140,28 @@ export function parseGallery(csv: string): SheetPhoto[] {
       album: o.album ?? '',
     }))
     .filter((p) => p.src);
+}
+
+/* ---------- Home page slideshow ---------- */
+
+/**
+ * Columns: Photo, Description, Order, Show. A row is hidden only when Show says no/false/hide;
+ * a blank Show means yes. Rows sort by Order (blank = after numbered rows, in sheet order).
+ */
+export function parseHero(csv: string): HeroSlide[] {
+  const seen = new Set<string>();
+  return toObjects(csv)
+    .map((o, i) => ({
+      i,
+      src: driveImageUrl(o.photo ?? o['photo link'] ?? ''),
+      alt: (o.description ?? o.caption ?? '').trim() || 'Photo from the PNGA community',
+      order: Number.parseFloat(o.order ?? ''),
+      show: !/^(no|n|false|hide|hidden|0)$/i.test((o.show ?? o.published ?? '').trim()),
+    }))
+    .filter((r) => r.show && r.src)
+    .sort((a, b) => (Number.isNaN(a.order) ? 1e9 : a.order) - (Number.isNaN(b.order) ? 1e9 : b.order) || a.i - b.i)
+    .filter((r) => (seen.has(r.src) ? false : (seen.add(r.src), true)))
+    .map(({ src, alt }) => ({ src, alt }));
 }
 
 /* ---------- Events ---------- */
@@ -295,6 +319,7 @@ function useSheet<T>(url: string, parse: (csv: string) => T, initial: T): T {
 const NEWS_SNAPSHOT = parseNews(snapshot.news);
 const GALLERY_SNAPSHOT = parseGallery(snapshot.gallery);
 const PROGRAMS_SNAPSHOT = parsePrograms((snapshot as { programs?: string }).programs ?? '');
+const HERO_SNAPSHOT = parseHero((snapshot as { hero?: string }).hero ?? '');
 const BOARD_SNAPSHOT = parseBoard((snapshot as { board?: string }).board ?? '');
 const EVENTS_SNAPSHOT = parseEvents((snapshot as { events?: string }).events ?? '');
 
@@ -306,6 +331,12 @@ export function useNews(): NewsItem[] {
 export function useGallery(): SheetPhoto[] {
   const fromSheet = useSheet(GALLERY_CSV_URL, parseGallery, GALLERY_SNAPSHOT);
   return fromSheet.length ? fromSheet : GALLERY_IMAGES.map((g) => ({ ...g, album: '' }));
+}
+
+/** Home-page slideshow photos from the volunteer-edited sheet, or the built-in four if the sheet is empty or not set up. */
+export function useHeroSlides(): HeroSlide[] {
+  const fromSheet = useSheet(HERO_CSV_URL, parseHero, HERO_SNAPSHOT);
+  return fromSheet.length ? fromSheet : HERO_SLIDES;
 }
 
 /** Events from the volunteer-edited sheet, or the fallback list in data/events.ts if the sheet is empty or not set up. */

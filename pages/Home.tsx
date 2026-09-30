@@ -5,9 +5,9 @@ import EventList from '../components/EventList';
 import NewsCard from '../components/NewsCard';
 import NewsletterSignup from '../components/NewsletterSignup';
 import FacebookGroupCard from '../components/FacebookGroupCard';
-import { useNews, usePrograms } from '../lib/sheets';
+import { useHeroSlides, useNews, usePrograms } from '../lib/sheets';
 import ProgramIcon from '../components/ProgramIcon';
-import { GALLERY_IMAGES } from '../data/gallery';
+import HeroSlideshow from '../components/HeroSlideshow';
 import { SITE } from '../lib/site';
 
 const QUICK = [
@@ -20,6 +20,7 @@ const QUICK = [
 export default function Home() {
   const news = useNews().slice(0, 3);
   const programs = usePrograms();
+  const heroSlides = useHeroSlides();
   return (
     <>
       <Seo path="/" jsonLd={[organizationJsonLd()]} />
@@ -37,16 +38,7 @@ export default function Home() {
                 empowerment, capacity building, civic engagement and advocacy.
               </p>
             </div>
-            <div className="overflow-hidden rounded-3xl shadow-xl">
-              <img
-                src={GALLERY_IMAGES[5].src}
-                alt={GALLERY_IMAGES[5].alt}
-                width={1358}
-                height={762}
-                fetchPriority="high"
-                className="aspect-[16/10] w-full object-cover"
-              />
-            </div>
+            <HeroSlideshow slides={heroSlides} />
           </div>
         </div>
 
