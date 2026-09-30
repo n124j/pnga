@@ -3,6 +3,8 @@
 export interface ProgramSection {
   heading: string;
   items: string[];
+  /** Optional one-sentence explanation shown under an item, keyed by the item's text. */
+  notes?: Record<string, string>;
 }
 
 export interface Program {

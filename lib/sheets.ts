@@ -268,6 +268,8 @@ export function parsePrograms(csv: string): Program[] {
       let sec = secs.get(heading.toLowerCase());
       if (!sec) { sec = { heading, items: [] }; secs.set(heading.toLowerCase(), sec); p.sections.push(sec); }
       sec.items.push(item);
+      const note = (o.description ?? '').trim();
+      if (note) (sec.notes ??= {})[item] = note;
     }
   }
   return [...byTitle.values()].map(({ p }) => p).filter((p) => p.sections.length > 0);
