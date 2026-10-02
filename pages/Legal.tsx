@@ -50,8 +50,9 @@ export function Privacy() {
       <p>We keep messages only as long as needed to respond, and delete help requests after about 12 months. We keep signed waivers, volunteer agreements and photo releases for as long as PNGA needs the record, and you can ask us to remove your details.</p>
       <h2>Other services</h2>
       <p>
-        This website loads fonts from Google Fonts and some photos from Google Photos and Unsplash. Those services
-        may see that your browser requested them. We do not use advertising or tracking cookies.
+        This website loads fonts from Google Fonts and photos from Google Drive and Google Photos, and it reads its
+        news, events, photo, board and program lists from published Google Sheets. Those services may see that your
+        browser requested them. We do not use advertising or tracking cookies.
       </p>
       <h2>Your choices</h2>
       <p>You can ask us to correct or delete what you sent us.</p>

@@ -13,3 +13,4 @@ dist-ssr
 .env.*
 !.env.example
 public/images/*
+*.docx
