@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useI18n } from '../lib/i18n';
 import Seo, { breadcrumbJsonLd } from '../components/Seo';
 import PageHeader from '../components/PageHeader';
 import AgreementText from '../components/AgreementText';
@@ -6,53 +6,56 @@ import AgreementForm, { DraftNotice, type FieldDef } from '../components/Agreeme
 import { EVENT_WAIVER } from '../data/agreements';
 import { SITE } from '../lib/site';
 
-const FIELDS: FieldDef[] = [
-  { label: 'Your full name', type: 'text', role: 'name', autoComplete: 'name' },
-  { label: 'Phone', type: 'tel', role: 'phone', required: false, autoComplete: 'tel', help: 'Phone or email is needed.' },
-  { label: 'Email', type: 'email', role: 'email', required: false, autoComplete: 'email' },
-  { label: 'Event name', type: 'text', required: false, help: 'Leave blank if this covers PNGA events in general.' },
-  { label: 'Emergency contact name', type: 'text' },
-  { label: 'Emergency contact phone', type: 'tel' },
-  {
-    label: 'Children under 18 attending with you',
-    type: 'textarea',
-    required: false,
-    help: 'Write each child\'s name and age. By signing you also sign for them.',
-  },
-];
-
 export default function Waiver() {
+  const { lang, t } = useI18n();
+  const FIELDS: FieldDef[] = [
+    { label: 'Your full name', labelNe: t('fld.name'), type: 'text', role: 'name', autoComplete: 'name' },
+    { label: 'Phone', labelNe: t('form.phone'), type: 'tel', role: 'phone', required: false, autoComplete: 'tel', help: 'Phone or email is needed.', helpNe: t('fld.phoneHelp') },
+    { label: 'Email', labelNe: t('form.email'), type: 'email', role: 'email', required: false, autoComplete: 'email' },
+    { label: 'Event name', labelNe: t('wv.fEvent'), type: 'text', required: false, help: 'Leave blank if this covers PNGA events in general.', helpNe: t('wv.fEventHelp') },
+    { label: 'Emergency contact name', labelNe: t('wv.fEcName'), type: 'text' },
+    { label: 'Emergency contact phone', labelNe: t('wv.fEcPhone'), type: 'tel' },
+    {
+      label: 'Children under 18 attending with you',
+      labelNe: t('wv.fKids'),
+      type: 'textarea',
+      required: false,
+      help: 'Write each child\'s name and age. By signing you also sign for them.',
+      helpNe: t('wv.fKidsHelp'),
+    },
+  ];
   return (
     <>
       <Seo
         path="/waiver"
-        title="Event Participation Waiver"
-        description="Read and sign the PNGA event participation waiver online."
+        title={t('wv.seoTitle')}
+        description={t('wv.seoDesc')}
         noindex={!SITE.waiversApproved}
-        jsonLd={[breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Event waiver', path: '/waiver' }])]}
+        jsonLd={[breadcrumbJsonLd([{ name: t('crumb.home'), path: '/' }, { name: t('wv.h1'), path: '/waiver' }], lang)]}
       />
       <PageHeader
-        title="Event waiver"
-        crumbs={[{ label: 'Get involved', to: '/get-involved' }, { label: 'Event waiver' }]}
-        intro="Please read this agreement and sign it once. It covers PNGA events you attend over the next 12 months."
+        title={t('wv.h1')}
+        crumbs={[{ label: t('gi.h1'), to: '/get-involved' }, { label: t('wv.h1') }]}
+        intro={t('wv.intro')}
       />
       <div className="mx-auto max-w-3xl space-y-8 px-4 py-10 sm:px-6">
         <DraftNotice />
-        <AgreementText title="Event participation agreement" agreement={EVENT_WAIVER} />
+        <AgreementText title={t('wv.agreementTitle')} agreement={EVENT_WAIVER} />
         <section aria-labelledby="sign" className="space-y-4">
-          <h2 id="sign" className="text-2xl font-bold text-navy">Your details</h2>
+          <h2 id="sign" className="text-2xl font-bold text-navy">{t('wv.details')}</h2>
           <AgreementForm
             formName="Event waiver"
             version={EVENT_WAIVER.version}
             fields={FIELDS}
             consentLabel="I have read this agreement and I agree to it."
-            submitLabel="Sign and send"
-            privacyNote="PNGA volunteers use this only to keep a record of your agreement and to reach your emergency contact if needed. Please do not write health details here."
+            consentLabelNe={t('wv.consent')}
+            submitLabel={t('wv.submit')}
+            privacyNote={t('wv.privacy')}
           />
         </section>
         <p className="text-lg">
-          Also see our <Link to="/photo-release" className="font-bold text-navy underline">photo and video release</Link> and{' '}
-          <Link to="/volunteer" className="font-bold text-navy underline">volunteer sign-up</Link>.
+          {t('wv.also')}<Link to="/photo-release" className="font-bold text-navy underline">{t('wv.photoLink')}</Link>{t('wv.and')}
+          <Link to="/volunteer" className="font-bold text-navy underline">{t('wv.volLink')}</Link>{t('wv.end')}
         </p>
       </div>
     </>

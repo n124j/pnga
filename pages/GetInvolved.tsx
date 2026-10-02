@@ -1,51 +1,52 @@
-import { Link } from 'react-router-dom';
+import { Link, pick, useI18n } from '../lib/i18n';
 import { HandHeart, Users } from 'lucide-react';
 import Seo, { breadcrumbJsonLd } from '../components/Seo';
 import PageHeader from '../components/PageHeader';
-import { VOLUNTEER_AREAS as AREAS } from '../data/agreements';
+import { VOLUNTEER_AREAS as AREAS, VOLUNTEER_AREAS_NE as AREAS_NE } from '../data/agreements';
 
 
 export default function GetInvolved() {
+  const { lang, t } = useI18n();
   return (
     <>
       <Seo
         path="/get-involved"
-        title="Volunteer with PNGA – Nepali Community Pennsylvania"
-        description="Volunteer with PNGA or become a member. Help at events, teach, translate, support newcomers and more."
-        jsonLd={[breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Get involved', path: '/get-involved' }])]}
+        title={t('gi.seoTitle')}
+        description={t('gi.seoDesc')}
+        jsonLd={[breadcrumbJsonLd([{ name: t('crumb.home'), path: '/' }, { name: t('gi.h1'), path: '/get-involved' }], lang)]}
       />
       <PageHeader
-        title="Get involved"
-        crumbs={[{ label: 'Get involved' }]}
-        intro="PNGA runs on volunteers. There is a way to help whatever your time or skills."
+        title={t('gi.h1')}
+        crumbs={[{ label: t('gi.h1') }]}
+        intro={t('gi.intro')}
       />
       <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2">
         <section className="rounded-2xl border border-slate-200 bg-white p-7" aria-labelledby="volunteer">
           <HandHeart size={36} className="text-crimson-dark" aria-hidden="true" />
-          <h2 id="volunteer" className="mt-3 text-3xl font-bold text-navy">Volunteer</h2>
-          <p className="mt-3 text-lg text-slate-700">You can help with:</p>
+          <h2 id="volunteer" className="mt-3 text-3xl font-bold text-navy">{t('gi.vol')}</h2>
+          <p className="mt-3 text-lg text-slate-700">{t('gi.canHelp')}</p>
           <ul className="mt-2 list-disc space-y-1 pl-6 text-lg">
-            {AREAS.map((a) => (
-              <li key={a}>{a}</li>
+            {AREAS.map((a, i) => (
+              <li key={a}>{pick(lang, a, AREAS_NE[i])}</li>
             ))}
           </ul>
-          <Link to="/volunteer" className="btn btn-primary mt-6">Sign up to volunteer</Link>
+          <Link to="/volunteer" className="btn btn-primary mt-6">{t('gi.signup')}</Link>
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-7" aria-labelledby="join">
           <Users size={36} className="text-navy" aria-hidden="true" />
-          <h2 id="join" className="mt-3 text-3xl font-bold text-navy">Become a member</h2>
-          <p className="mt-3 text-lg text-slate-700">PNGA has four types of members:</p>
+          <h2 id="join" className="mt-3 text-3xl font-bold text-navy">{t('gi.member')}</h2>
+          <p className="mt-3 text-lg text-slate-700">{t('about.membersIntro')}</p>
           <ul className="mt-2 list-disc space-y-1 pl-6 text-lg">
-            <li>Founding Members</li>
-            <li>Promoters</li>
-            <li>Life Members</li>
-            <li>Annual Members</li>
+            <li>{t('about.m1')}</li>
+            <li>{t('about.m2')}</li>
+            <li>{t('about.m3')}</li>
+            <li>{t('about.m4')}</li>
           </ul>
           <p className="mt-3 text-slate-700">
-            Tell us you are interested and we will send you the details.
+            {t('gi.tell')}
           </p>
-          <Link to="/contact?topic=Membership" className="btn btn-navy mt-6">Tell us you are interested</Link>
+          <Link to="/contact?topic=Membership" className="btn btn-navy mt-6">{t('gi.interested')}</Link>
         </section>
       </div>
     </>

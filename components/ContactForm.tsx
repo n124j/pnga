@@ -2,6 +2,7 @@ import { useId, useState } from 'react';
 import { AlertCircle, CheckCircle2, Loader2, Send } from 'lucide-react';
 import { sendForm, type SendResult } from '../lib/forms';
 import { SITE } from '../lib/site';
+import { useI18n } from '../lib/i18n';
 
 export interface FormOption {
   value: string;
@@ -35,6 +36,7 @@ export default function ContactForm({
   requireContact = true,
 }: Props) {
   const uid = useId();
+  const { t, lang } = useI18n();
   const [status, setStatus] = useState<'idle' | 'sending' | SendResult>('idle');
   const [formError, setFormError] = useState('');
 
@@ -51,7 +53,7 @@ export default function ContactForm({
     const email = String(data.get('email') ?? '').trim();
     const phone = String(data.get('phone') ?? '').trim();
     if (requireContact && !email && !phone) {
-      setFormError('Please give us a phone number or an email address so we can reply.');
+      setFormError(t('form.needContact'));
       return;
     }
     setFormError('');
@@ -75,17 +77,17 @@ export default function ContactForm({
   return (
     <form onSubmit={onSubmit} className="space-y-6" noValidate={false}>
       <div>
-        <label htmlFor={id('name')} className="field-label">Your name</label>
+        <label htmlFor={id('name')} className="field-label">{t('form.name')}</label>
         <input id={id('name')} name="name" type="text" required autoComplete="name" className="field" disabled={busy} />
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
-          <label htmlFor={id('phone')} className="field-label">Phone {requireContact && <span className="font-normal text-slate-600">(phone or email)</span>}</label>
+          <label htmlFor={id('phone')} className="field-label">{t('form.phone')} {requireContact && <span className="font-normal text-slate-600">{t('form.phoneOrEmail')}</span>}</label>
           <input id={id('phone')} name="phone" type="tel" autoComplete="tel" inputMode="tel" className="field" disabled={busy} />
         </div>
         <div>
-          <label htmlFor={id('email')} className="field-label">Email {requireContact && <span className="font-normal text-slate-600">(phone or email)</span>}</label>
+          <label htmlFor={id('email')} className="field-label">{t('form.email')} {requireContact && <span className="font-normal text-slate-600">{t('form.phoneOrEmail')}</span>}</label>
           <input id={id('email')} name="email" type="email" autoComplete="email" className="field" disabled={busy} />
         </div>
       </div>
@@ -94,9 +96,9 @@ export default function ContactForm({
         <div>
           <label htmlFor={id('topic')} className="field-label">{topics.label}</label>
           <select id={id('topic')} name="topic" required defaultValue={defaultTopic ?? ''} className="field" disabled={busy}>
-            <option value="" disabled>Choose one</option>
+            <option value="" disabled>{t('form.choose')}</option>
             {topics.options.map((o) => (
-              <option key={o.value} value={o.label}>{o.label}</option>
+              <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
         </div>
@@ -104,11 +106,11 @@ export default function ContactForm({
 
       {showLanguage && (
         <div>
-          <label htmlFor={id('language')} className="field-label">Language you prefer</label>
-          <select id={id('language')} name="language" defaultValue="English" className="field" disabled={busy}>
-            <option>English</option>
-            <option>नेपाली (Nepali)</option>
-            <option>Other</option>
+          <label htmlFor={id('language')} className="field-label">{t('form.lang')}</label>
+          <select id={id('language')} name="language" defaultValue={lang === 'ne' ? 'नेपाली (Nepali)' : 'English'} className="field" disabled={busy}>
+            <option value="English">{t('form.langEn')}</option>
+            <option value="नेपाली (Nepali)">{t('form.langNe')}</option>
+            <option value="Other">{t('form.langOther')}</option>
           </select>
         </div>
       )}
@@ -144,27 +146,27 @@ export default function ContactForm({
 
       <button type="submit" disabled={busy} className="btn btn-primary w-full sm:w-auto disabled:opacity-60">
         {busy ? <Loader2 size={20} className="animate-spin" aria-hidden="true" /> : <Send size={20} aria-hidden="true" />}
-        {busy ? 'Sending…' : submitLabel}
+        {busy ? t('form.sending') : submitLabel}
       </button>
 
       <div role="status" aria-live="polite">
         {status === 'sent' && (
           <p className="flex items-start gap-2 rounded-xl bg-green-50 p-4 font-semibold text-green-900">
             <CheckCircle2 size={22} className="mt-0.5 shrink-0" aria-hidden="true" />
-            Thank you. Your message was sent and a PNGA volunteer will reply as soon as they can.
+            {t('form.sent')}
           </p>
         )}
         {(status === 'error' || status === 'not-configured') && (
           <p className="flex items-start gap-2 rounded-xl bg-red-50 p-4 font-semibold text-red-900">
             <AlertCircle size={22} className="mt-0.5 shrink-0" aria-hidden="true" />
             <span>
-              Sorry, your message was not sent.{' '}
+              {t('form.fail')}{' '}
               {SITE.email ? (
-                <>Please email us at <a className="underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>.</>
+                <>{t('form.failEmail')}<a className="underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>.</>
               ) : SITE.phone ? (
-                <>Please call us at <a className="underline" href={`tel:${SITE.phone.replace(/[^+\d]/g, '')}`}>{SITE.phone}</a>.</>
+                <>{t('form.failPhone')}<a className="underline" href={`tel:${SITE.phone.replace(/[^+\d]/g, '')}`}>{SITE.phone}</a>.</>
               ) : (
-                <>Please try again later or write to us at {SITE.address.street}, {SITE.address.city}, {SITE.address.region} {SITE.address.zip}.</>
+                <>{t('form.failAddr')}{SITE.address.street}, {SITE.address.city}, {SITE.address.region} {SITE.address.zip}.</>
               )}
             </span>
           </p>

@@ -1,4 +1,6 @@
 import type { CommunityEvent } from '../data/events';
+import { formatDay, formatTimeRange } from './dates';
+import type { Lang } from './i18n';
 
 const stamp = (date: string, time = '09:00') => `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
 
@@ -41,19 +43,9 @@ export const directionsUrl = (e: CommunityEvent): string =>
     [e.location, e.address].filter(Boolean).join(', '),
   )}`;
 
-export function formatEventDate(e: CommunityEvent): string {
+export function formatEventDate(e: CommunityEvent, lang: Lang = 'en'): string {
   const [y, m, d] = e.date.split('-').map(Number);
-  const day = new Date(y, m - 1, d).toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
-  const t = (hhmm?: string) => {
-    if (!hhmm) return '';
-    const [h, min] = hhmm.split(':').map(Number);
-    return new Date(2000, 0, 1, h, min).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  };
-  const time = e.startTime ? (e.endTime ? `${t(e.startTime)} – ${t(e.endTime)}` : t(e.startTime)) : '';
+  const day = formatDay(lang, y, m, d, true);
+  const time = formatTimeRange(lang, e.startTime, e.endTime);
   return time ? `${day}, ${time}` : day;
 }

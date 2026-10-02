@@ -1,22 +1,26 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router-dom';
-import { Facebook, Heart, Instagram, LifeBuoy, Mail, MapPin, Menu, Phone, Users, X, Youtube } from 'lucide-react';
+import { Link as RouterLink, Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router-dom';
+import { Facebook, Heart, Instagram, Languages, LifeBuoy, Mail, MapPin, Menu, Phone, Users, X, Youtube } from 'lucide-react';
 import { NAV_LINKS, SITE, addressLine, mapsUrl, telHref } from '../lib/site';
+import { Link, NavLink, isTranslated, otherLangPath, stripLang, useI18n } from '../lib/i18n';
+
+export const LANG_STORAGE_KEY = 'pnga-lang';
 
 function Banner() {
   const [open, setOpen] = useState(true);
+  const { t } = useI18n();
   if (!SITE.announcement || !open) return null;
   return (
-    <div role="region" aria-label="Community announcement" className="bg-gold text-slate-900">
+    <div role="region" aria-label={t('announce.region')} className="bg-gold text-slate-900">
       <div className="mx-auto flex max-w-7xl items-start justify-between gap-4 px-4 py-3 sm:px-6">
         <p className="font-semibold">
-          <span className="sr-only">Announcement: </span>
+          <span className="sr-only">{t('announce.prefix')}</span>
           {SITE.announcement}
         </p>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          aria-label="Dismiss announcement"
+          aria-label={t('announce.dismiss')}
           className="-m-2 flex h-12 w-12 shrink-0 items-center justify-center rounded-full hover:bg-black/10"
         >
           <X size={22} aria-hidden="true" />
@@ -26,63 +30,89 @@ function Banner() {
   );
 }
 
+/** One button that opens the same page in the other language, and remembers the choice. */
+function LanguageSwitch() {
+  const { pathname, search, hash } = useLocation();
+  const { t } = useI18n();
+  const { lang, to } = otherLangPath(pathname, search, hash);
+  return (
+    <RouterLink
+      to={to}
+      lang={lang}
+      hrefLang={lang}
+      aria-label={t('lang.otherAria')}
+      onClick={() => {
+        try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch { /* private mode: the choice just isn't remembered */ }
+      }}
+      className="btn btn-outline !px-3"
+    >
+      <Languages size={20} aria-hidden="true" />
+      <span lang={lang}>{t('lang.other')}</span>
+    </RouterLink>
+  );
+}
+
 function Header() {
   const [open, setOpen] = useState(false);
   const { pathname, hash } = useLocation();
+  const { t, lang } = useI18n();
 
   useEffect(() => setOpen(false), [pathname]);
   // Jump to #section links (for example /news#newsletter) after the page has rendered.
   useEffect(() => {
     if (!hash) return;
-    const t = window.setTimeout(() => document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' }), 50);
-    return () => window.clearTimeout(t);
+    const timer = window.setTimeout(() => document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' }), 50);
+    return () => window.clearTimeout(timer);
   }, [pathname, hash]);
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `whitespace-nowrap rounded-lg px-3 py-2 font-semibold hover:text-crimson ${isActive ? 'text-crimson underline underline-offset-8 decoration-2' : 'text-slate-800'}`;
+    `whitespace-nowrap rounded-lg ${lang === 'ne' ? 'px-2' : 'px-3'} py-2 font-semibold hover:text-crimson ${isActive ? 'text-crimson underline underline-offset-8 decoration-2' : 'text-slate-800'}`;
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <Link to="/" className="flex items-center gap-3" aria-label={`${SITE.name}, home`}>
+        <Link to="/" className="flex items-center gap-3" aria-label={t('header.home', { name: t('site.name') })}>
           <img src={SITE.logoUrl} alt="" width={48} height={48} className="h-12 w-12 rounded-full object-contain" />
           <span className="font-serif text-lg font-bold leading-tight text-navy">
-            <span className="xl:hidden">{SITE.shortName}</span>
-            <span className="hidden 2xl:inline">{SITE.name}</span>
+            {/* The Nepali name is long and the Nepali menu is wider, so Nepali pages show just "PNGA" here (the full name is in the page and footer). */}
+            <span className={lang === 'ne' ? '' : 'xl:hidden'}>{SITE.shortName}</span>
+            {lang !== 'ne' && <span className="hidden 2xl:inline">{t('site.name')}</span>}
           </span>
         </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-1 xl:flex">
+        <nav aria-label={t('header.main')} className="hidden shrink-0 items-center gap-1 xl:flex">
           {NAV_LINKS.map((l) => (
             <NavLink key={l.to} to={l.to} end={l.to === '/'} className={linkClass}>
-              {l.label}
+              {t(l.key)}
             </NavLink>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 xl:flex">
-          <Link to="/help" className="btn btn-outline">
-            <LifeBuoy size={20} aria-hidden="true" /> Need Help?
-          </Link>
-          <Link to="/donate" className="btn btn-primary">
-            <Heart size={20} aria-hidden="true" /> Donate
-          </Link>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <LanguageSwitch />
+          <div className="hidden items-center gap-3 xl:flex">
+            <Link to="/help" className="btn btn-outline">
+              <LifeBuoy size={20} aria-hidden="true" /> {t('header.help')}
+            </Link>
+            <Link to="/donate" className="btn btn-primary">
+              <Heart size={20} aria-hidden="true" /> {t('header.donate')}
+            </Link>
+          </div>
+          <button
+            type="button"
+            className="btn btn-outline !px-3 xl:hidden"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
+            {open ? t('header.close') : t('header.menu')}
+          </button>
         </div>
-
-        <button
-          type="button"
-          className="btn btn-outline xl:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
-          {open ? 'Close' : 'Menu'}
-        </button>
       </div>
 
       {open && (
-        <nav id="mobile-menu" aria-label="Main" className="border-t border-slate-200 bg-white xl:hidden">
+        <nav id="mobile-menu" aria-label={t('header.main')} className="border-t border-slate-200 bg-white xl:hidden">
           <ul className="mx-auto max-w-7xl px-4 py-2 sm:px-6">
             {NAV_LINKS.map((l) => (
               <li key={l.to}>
@@ -93,7 +123,7 @@ function Header() {
                     `block rounded-lg px-3 py-4 text-lg font-semibold ${isActive ? 'bg-slate-100 text-crimson' : 'text-slate-800'}`
                   }
                 >
-                  {l.label}
+                  {t(l.key)}
                 </NavLink>
               </li>
             ))}
@@ -106,30 +136,55 @@ function Header() {
 
 function Footer() {
   const year = new Date().getFullYear();
+  const { t } = useI18n();
   const social = [
-    { href: SITE.social.facebook, label: 'PNGA on Facebook', Icon: Facebook },
-    { href: SITE.social.instagram, label: 'PNGA on Instagram', Icon: Instagram },
-    { href: SITE.social.youtube, label: 'PNGA on YouTube', Icon: Youtube },
-    { href: SITE.social.facebookGroup, label: 'PNGA Facebook group', Icon: Users },
+    { href: SITE.social.facebook, label: t('social.facebook'), Icon: Facebook },
+    { href: SITE.social.instagram, label: t('social.instagram'), Icon: Instagram },
+    { href: SITE.social.youtube, label: t('social.youtube'), Icon: Youtube },
+    { href: SITE.social.facebookGroup, label: t('social.group'), Icon: Users },
   ].filter((s) => s.href);
+
+  const links: [string, Parameters<typeof t>[0]][] = [
+    ['/help', 'fl.help'],
+    ['/events', 'fl.events'],
+    ['/news', 'fl.news'],
+    ['/news#newsletter', 'fl.newsletter'],
+    ['/unsubscribe', 'fl.unsub'],
+    ['/get-involved', 'fl.involved'],
+    ['/volunteer', 'fl.volunteer'],
+    ['/waiver', 'fl.waiver'],
+    ['/photo-release', 'fl.photo'],
+    ['/donate', 'fl.donate'],
+    ['/about/history', 'fl.history'],
+    ['/about/leadership', 'fl.board'],
+    ['/gallery', 'fl.gallery'],
+    ['/privacy', 'fl.privacy'],
+    ['/accessibility', 'fl.access'],
+    ['/terms', 'fl.terms'],
+  ];
 
   return (
     <footer className="bg-slate-900 pb-28 pt-14 text-slate-200 xl:pb-14">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 md:grid-cols-3">
         <div className="space-y-3">
-          <p className="font-serif text-2xl font-bold text-white">{SITE.name}</p>
-          <p>{SITE.tagline}.</p>
-          {SITE.taxExempt && <p className="text-sm text-slate-300">PNGA is a 501(c)(3) tax-exempt organization.{SITE.ein ? ` EIN ${SITE.ein}.` : ''}</p>}
-          {!SITE.taxExempt && SITE.ein && <p className="text-sm text-slate-300">Tax ID (EIN): {SITE.ein}</p>}
+          <p className="font-serif text-2xl font-bold text-white">{t('site.name')}</p>
+          <p>{t('site.tagline')}.</p>
+          {SITE.taxExempt && (
+            <p className="text-sm text-slate-300">
+              {t('footer.taxExempt')}
+              {SITE.ein ? t('footer.ein', { ein: SITE.ein }) : ''}
+            </p>
+          )}
+          {!SITE.taxExempt && SITE.ein && <p className="text-sm text-slate-300">{t('footer.einOnly', { ein: SITE.ein })}</p>}
         </div>
 
         <div className="space-y-3">
-          <h2 className="font-sans text-lg font-bold text-white">Contact</h2>
+          <h2 className="font-sans text-lg font-bold text-white">{t('footer.contact')}</h2>
           <p className="flex gap-2">
             <MapPin size={20} className="mt-1 shrink-0" aria-hidden="true" />
             <a href={mapsUrl} className="underline hover:text-white" target="_blank" rel="noopener noreferrer">
               {addressLine}
-              <span className="sr-only"> (opens map in a new tab)</span>
+              <span className="sr-only">{t('common.mapTab')}</span>
             </a>
           </p>
           {SITE.phone && (
@@ -163,36 +218,19 @@ function Footer() {
           )}
         </div>
 
-        <nav aria-label="Footer" className="space-y-3">
-          <h2 className="font-sans text-lg font-bold text-white">Quick links</h2>
+        <nav aria-label={t('footer.nav')} className="space-y-3">
+          <h2 className="font-sans text-lg font-bold text-white">{t('footer.quick')}</h2>
           <ul className="grid gap-2">
-            {[
-              ['/help', 'Get help'],
-              ['/events', 'Events'],
-              ['/news', 'News'],
-              ['/news#newsletter', 'Newsletter sign-up'],
-              ['/unsubscribe', 'Unsubscribe'],
-              ['/get-involved', 'Volunteer and membership'],
-              ['/volunteer', 'Volunteer sign-up'],
-              ['/waiver', 'Event waiver'],
-              ['/photo-release', 'Photo release'],
-              ['/donate', 'Donate'],
-              ['/about/history', 'Our history'],
-              ['/about/leadership', 'Board of directors'],
-              ['/gallery', 'Photo gallery'],
-              ['/privacy', 'Privacy policy'],
-              ['/accessibility', 'Accessibility'],
-              ['/terms', 'Terms of use'],
-            ].map(([to, label]) => (
+            {links.map(([to, key]) => (
               <li key={to}>
-                <Link to={to} className="inline-block py-1 underline hover:text-white">{label}</Link>
+                <Link to={to} className="inline-block py-1 underline hover:text-white">{t(key)}</Link>
               </li>
             ))}
           </ul>
         </nav>
       </div>
       <p className="mx-auto mt-10 max-w-7xl border-t border-white/10 px-4 pt-6 text-sm text-slate-300 sm:px-6">
-        © {year} {SITE.name}. All rights reserved.
+        {t('footer.copy', { year, name: t('site.name') })}
       </p>
     </footer>
   );
@@ -200,24 +238,62 @@ function Footer() {
 
 /** Two big buttons pinned to the bottom of phone screens. */
 function MobileActionBar() {
+  const { t } = useI18n();
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-3 border-t border-slate-200 bg-white p-3 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] xl:hidden">
       <Link to="/help" className="btn btn-outline">
-        <LifeBuoy size={20} aria-hidden="true" /> Need Help?
+        <LifeBuoy size={20} aria-hidden="true" /> {t('header.help')}
       </Link>
       <Link to="/donate" className="btn btn-primary">
-        <Heart size={20} aria-hidden="true" /> Donate
+        <Heart size={20} aria-hidden="true" /> {t('header.donate')}
       </Link>
     </div>
   );
 }
 
+/** Shown on Nepali addresses whose page is not translated yet. */
+function UntranslatedNotice() {
+  const { pathname, search, hash } = useLocation();
+  const { lang, t } = useI18n();
+  if (lang !== 'ne' || isTranslated(stripLang(pathname))) return null;
+  const { to } = otherLangPath(pathname, search, hash);
+  return (
+    <div role="note" className="border-b border-amber-300 bg-amber-50 text-amber-950">
+      <p className="mx-auto max-w-7xl px-4 py-3 sm:px-6">
+        {t('notice.untranslated')}{' '}
+        <RouterLink to={to} className="font-bold underline">
+          {t('notice.english')}
+        </RouterLink>
+      </p>
+    </div>
+  );
+}
+
 export default function Layout() {
+  const { pathname, search, hash } = useLocation();
+  const navigate = useNavigate();
+  const { lang, t } = useI18n();
+
+  // Keep <html lang> right when the visitor switches language without a full page load.
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  // A visitor who chose Nepali before is taken to the Nepali home page when they open the English one.
+  useEffect(() => {
+    try {
+      if (pathname === '/' && localStorage.getItem(LANG_STORAGE_KEY) === 'ne') navigate(`/ne${search}${hash}`, { replace: true });
+    } catch { /* storage blocked: stay on English */ }
+    // only on the first load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
-      <a href="#main" className="skip-link">Skip to main content</a>
+      <a href="#main" className="skip-link">{t('skip')}</a>
       <Banner />
       <Header />
+      <UntranslatedNotice />
       <main id="main" tabIndex={-1}>
         <Outlet />
       </main>

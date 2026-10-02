@@ -24,6 +24,19 @@ export const VOLUNTEER_AREAS = [
   'Photography and video',
 ];
 
+/** Same order as VOLUNTEER_AREAS. Display only; the English name is what gets saved with the sign-up. */
+export const VOLUNTEER_AREAS_NE = [
+  'आयोजनाहरू',
+  'शिक्षा र युवा',
+  'स्वास्थ्य सचेतना',
+  'अनुवाद',
+  'प्रविधि',
+  'कोष सङ्कलन',
+  'सामुदायिक पहुँच',
+  'प्रशासन',
+  'फोटोग्राफी र भिडियो',
+];
+
 export const EVENT_WAIVER: Agreement = {
   version: 'event-waiver-draft-1',
   sections: [

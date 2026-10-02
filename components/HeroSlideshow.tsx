@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
+import { pick, useI18n } from '../lib/i18n';
 
 export interface Slide {
   src: string;
   alt: string;
+  altNe?: string;
 }
 
 /**
@@ -20,6 +22,7 @@ export default function HeroSlideshow({ slides: all, interval = 6000 }: { slides
   const [playing, setPlaying] = useState(true);
   const [held, setHeld] = useState(false);
   const box = useRef<HTMLDivElement>(null);
+  const { lang, t } = useI18n();
 
   useEffect(() => {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) setPlaying(false);
@@ -42,7 +45,7 @@ export default function HeroSlideshow({ slides: all, interval = 6000 }: { slides
       ref={box}
       role="group"
       aria-roledescription="carousel"
-      aria-label="Photos from our community"
+      aria-label={t('hero.group')}
       className="relative overflow-hidden rounded-3xl bg-navy-dark shadow-xl"
       onMouseEnter={() => setHeld(true)}
       onMouseLeave={() => setHeld(false)}
@@ -54,7 +57,7 @@ export default function HeroSlideshow({ slides: all, interval = 6000 }: { slides
           <img
             key={s.src}
             src={s.src}
-            alt={s.alt}
+            alt={pick(lang, s.alt, s.altNe)}
             width={1600}
             height={1000}
             loading={i === 0 ? 'eager' : 'lazy'}
@@ -70,7 +73,7 @@ export default function HeroSlideshow({ slides: all, interval = 6000 }: { slides
         <button
           type="button"
           onClick={() => setPlaying((p) => !p)}
-          aria-label={playing ? 'Pause the photo slideshow' : 'Play the photo slideshow'}
+          aria-label={playing ? t('hero.pause') : t('hero.play')}
           className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-navy hover:bg-slate-100"
         >
           {playing ? <Pause size={20} aria-hidden="true" /> : <Play size={20} aria-hidden="true" />}
@@ -82,7 +85,7 @@ export default function HeroSlideshow({ slides: all, interval = 6000 }: { slides
                 key={s.src}
                 type="button"
                 onClick={() => setIndex(i)}
-                aria-label={`Show photo ${i + 1} of ${slides.length}`}
+                aria-label={t('hero.show', { n: i + 1, total: slides.length })}
                 aria-current={i === index ? 'true' : undefined}
                 className="flex h-11 w-9 items-center justify-center"
               >
@@ -92,7 +95,7 @@ export default function HeroSlideshow({ slides: all, interval = 6000 }: { slides
           </div>
         )}
       </div>
-      <p className="sr-only" aria-live={playing ? 'off' : 'polite'}>{`Photo ${index + 1} of ${slides.length}: ${slides[index]?.alt ?? ''}`}</p>
+      <p className="sr-only" aria-live={playing ? 'off' : 'polite'}>{t('hero.current', { n: index + 1, total: slides.length, alt: slides[index] ? pick(lang, slides[index].alt, slides[index].altNe) : '' })}</p>
     </div>
   );
 }

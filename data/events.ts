@@ -26,6 +26,10 @@ export interface CommunityEvent {
   location: string;
   address?: string;
   description: string;
+  /** Optional Nepali text (from the "... (Nepali)" sheet columns). Empty means "show the English". */
+  titleNe?: string;
+  locationNe?: string;
+  descriptionNe?: string;
   category: string;
   registrationUrl?: string;
 }

@@ -1,53 +1,55 @@
-import { Link } from 'react-router-dom';
+import { Link, useI18n } from '../lib/i18n';
 import Seo, { breadcrumbJsonLd } from '../components/Seo';
 import PageHeader from '../components/PageHeader';
 import AgreementText from '../components/AgreementText';
 import AgreementForm, { DraftNotice, type FieldDef } from '../components/AgreementForm';
-import { VOLUNTEER_AGREEMENT, VOLUNTEER_AREAS } from '../data/agreements';
+import { VOLUNTEER_AGREEMENT, VOLUNTEER_AREAS, VOLUNTEER_AREAS_NE } from '../data/agreements';
 import { SITE } from '../lib/site';
 
-const FIELDS: FieldDef[] = [
-  { label: 'Your full name', type: 'text', role: 'name', autoComplete: 'name' },
-  { label: 'Phone', type: 'tel', role: 'phone', required: false, autoComplete: 'tel', help: 'Phone or email is needed.' },
-  { label: 'Email', type: 'email', role: 'email', required: false, autoComplete: 'email' },
-  { label: 'Language you prefer', type: 'select', options: ['English', 'नेपाली (Nepali)', 'Other'] },
-  { label: 'How would you like to help?', type: 'checkboxes', options: VOLUNTEER_AREAS, help: 'Choose all that interest you.' },
-  { label: 'When are you usually free?', type: 'textarea', required: false, help: 'For example, weekends or weekday evenings.' },
-  { label: 'Anything else we should know?', type: 'textarea', required: false, help: 'Skills, languages spoken, or ideas. Please do not include health details.' },
-];
-
 export default function Volunteer() {
+  const { lang, t } = useI18n();
+  const FIELDS: FieldDef[] = [
+    { label: 'Your full name', labelNe: t('fld.name'), type: 'text', role: 'name', autoComplete: 'name' },
+    { label: 'Phone', labelNe: t('form.phone'), type: 'tel', role: 'phone', required: false, autoComplete: 'tel', help: 'Phone or email is needed.', helpNe: t('fld.phoneHelp') },
+    { label: 'Email', labelNe: t('form.email'), type: 'email', role: 'email', required: false, autoComplete: 'email' },
+    { label: 'Language you prefer', labelNe: t('form.lang'), type: 'select', options: ['English', 'नेपाली (Nepali)', 'Other'], optionsNe: [t('fld.langEn'), t('fld.langNe'), t('fld.langOther')] },
+    { label: 'How would you like to help?', labelNe: t('vol.fHow'), type: 'checkboxes', options: VOLUNTEER_AREAS, optionsNe: VOLUNTEER_AREAS_NE, help: 'Choose all that interest you.', helpNe: t('vol.fHowHelp') },
+    { label: 'When are you usually free?', labelNe: t('vol.fFree'), type: 'textarea', required: false, help: 'For example, weekends or weekday evenings.', helpNe: t('vol.fFreeHelp') },
+    { label: 'Anything else we should know?', labelNe: t('vol.fElse'), type: 'textarea', required: false, help: 'Skills, languages spoken, or ideas. Please do not include health details.', helpNe: t('vol.fElseHelp') },
+  ];
   return (
     <>
       <Seo
         path="/volunteer"
-        title="Volunteer Sign-up"
-        description="Sign up to volunteer with PNGA and agree to the volunteer agreement online."
+        title={t('vol.seoTitle')}
+        description={t('vol.seoDesc')}
         noindex={!SITE.waiversApproved}
-        jsonLd={[breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Volunteer sign-up', path: '/volunteer' }])]}
+        jsonLd={[breadcrumbJsonLd([{ name: t('crumb.home'), path: '/' }, { name: t('vol.h1'), path: '/volunteer' }], lang)]}
       />
       <PageHeader
-        title="Volunteer sign-up"
-        crumbs={[{ label: 'Get involved', to: '/get-involved' }, { label: 'Volunteer sign-up' }]}
-        intro="Tell us how you would like to help and read the volunteer agreement. A PNGA volunteer will contact you."
+        title={t('vol.h1')}
+        crumbs={[{ label: t('gi.h1'), to: '/get-involved' }, { label: t('vol.h1') }]}
+        intro={t('vol.intro')}
       />
       <div className="mx-auto max-w-3xl space-y-8 px-4 py-10 sm:px-6">
         <DraftNotice />
-        <AgreementText title="Volunteer agreement" agreement={VOLUNTEER_AGREEMENT} />
+        <AgreementText title={t('vol.agreementTitle')} agreement={VOLUNTEER_AGREEMENT} />
         <section aria-labelledby="sign" className="space-y-4">
-          <h2 id="sign" className="text-2xl font-bold text-navy">About you</h2>
+          <h2 id="sign" className="text-2xl font-bold text-navy">{t('vol.about')}</h2>
           <AgreementForm
             formName="Volunteer sign-up"
             version={VOLUNTEER_AGREEMENT.version}
             fields={FIELDS}
             confirmations={['I am 18 years old or older.']}
+            confirmationsNe={[t('vol.confirm18')]}
             consentLabel="I have read the volunteer agreement and I agree to it."
-            submitLabel="Sign up to volunteer"
-            privacyNote="PNGA volunteers use this to contact you and to keep a record of your agreement."
+            consentLabelNe={t('vol.consent')}
+            submitLabel={t('vol.submit')}
+            privacyNote={t('vol.privacy')}
           />
         </section>
         <p className="text-lg">
-          Under 18 and want to help? <Link to="/contact?topic=Volunteering" className="font-bold text-navy underline">Contact us</Link> and a parent or guardian can arrange it with us.
+          {t('vol.under18')}<Link to="/contact?topic=Volunteering" className="font-bold text-navy underline">{t('vol.under18Link')}</Link>{t('vol.under18End')}
         </p>
       </div>
     </>

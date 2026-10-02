@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, pick, useI18n } from '../lib/i18n';
 import Seo, { breadcrumbJsonLd } from '../components/Seo';
 import PageHeader from '../components/PageHeader';
 import Lightbox from '../components/Lightbox';
@@ -11,8 +11,10 @@ const PAGE_SIZE = 12;
 const thumb = (src: string) => src.replace(/=w\d+$/, '=w600');
 
 export default function Gallery() {
+  const { lang, t } = useI18n();
   const all = useGallery();
   const albums = Array.from(new Set(all.map((p) => p.album).filter(Boolean)));
+  const albumNe = new Map(all.filter((p) => p.album && p.albumNe).map((p) => [p.album, p.albumNe as string]));
   const [album, setAlbum] = useState('All');
   const [page, setPage] = useState(1);
   // The popup only browses the album of the photo that was clicked, never the whole gallery.
@@ -56,16 +58,16 @@ export default function Gallery() {
     <>
       <Seo
         path="/gallery"
-        title="Photo Gallery"
-        description="Photos from PNGA celebrations and community gatherings in Pennsylvania."
-        jsonLd={[breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Photo gallery', path: '/gallery' }])]}
+        title={t('gal.seoTitle')}
+        description={t('gal.seoDesc')}
+        jsonLd={[breadcrumbJsonLd([{ name: t('crumb.home'), path: '/' }, { name: t('gal.h1'), path: '/gallery' }], lang)]}
       />
-      <PageHeader title="Photo gallery" crumbs={[{ label: 'Photo gallery' }]} intro="Moments from our celebrations and gatherings. Select a photo to see it larger." />
+      <PageHeader title={t('gal.h1')} crumbs={[{ label: t('gal.h1') }]} intro={t('gal.intro')} />
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <h2 ref={top} tabIndex={-1} className="sr-only">Photos</h2>
+        <h2 ref={top} tabIndex={-1} className="sr-only">{t('gal.photos')}</h2>
 
         {albums.length > 1 && (
-          <div role="group" aria-label="Filter by album" className="mb-8 flex flex-wrap gap-2">
+          <div role="group" aria-label={t('gal.filter')} className="mb-8 flex flex-wrap gap-2">
             {['All', ...albums].map((a) => (
               <button
                 key={a}
@@ -76,7 +78,7 @@ export default function Gallery() {
                   a === album ? 'border-navy bg-navy text-white' : 'border-navy bg-white text-navy hover:bg-slate-100'
                 }`}
               >
-                {a}
+                {a === 'All' ? t('category.all') : pick(lang, a, albumNe.get(a))}
               </button>
             ))}
           </div>
@@ -90,10 +92,10 @@ export default function Gallery() {
                   type="button"
                   onClick={() => openPhoto(img.src, img.album)}
                   className="group block w-full text-left"
-                  aria-label={`View larger: ${img.caption || img.alt}`}
+                  aria-label={t('gal.view', { caption: pick(lang, img.caption || img.alt, img.captionNe) })}
                 >
                   <img src={thumb(img.src)} alt="" loading="lazy" className="aspect-square w-full object-cover transition-transform group-hover:scale-105" />
-                  {img.caption && <span className="block p-3 text-base text-slate-800 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">{img.caption}</span>}
+                  {img.caption && <span className="block p-3 text-base text-slate-800 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">{pick(lang, img.caption, img.captionNe)}</span>}
                 </button>
               </li>
             );
@@ -101,9 +103,9 @@ export default function Gallery() {
         </ul>
 
         {pages > 1 && (
-          <nav aria-label="Gallery pages" className="mt-10 flex flex-wrap items-center justify-center gap-2">
+          <nav aria-label={t('gal.pages')} className="mt-10 flex flex-wrap items-center justify-center gap-2">
             <button type="button" disabled={current === 1} onClick={() => setPage(current - 1)} className={`${pageBtn} border-navy bg-white text-navy hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40`}>
-              Previous
+              {t('gal.prev')}
             </button>
             {Array.from({ length: pages }, (_, n) => n + 1).map((n) => (
               <button
@@ -111,21 +113,21 @@ export default function Gallery() {
                 type="button"
                 onClick={() => setPage(n)}
                 aria-current={n === current ? 'page' : undefined}
-                aria-label={`Page ${n}`}
+                aria-label={t('gal.page', { n })}
                 className={`${pageBtn} ${n === current ? 'border-navy bg-navy text-white' : 'border-navy bg-white text-navy hover:bg-slate-100'}`}
               >
                 {n}
               </button>
             ))}
             <button type="button" disabled={current === pages} onClick={() => setPage(current + 1)} className={`${pageBtn} border-navy bg-white text-navy hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40`}>
-              Next
+              {t('gal.next')}
             </button>
           </nav>
         )}
-        {pages > 1 && <p className="mt-3 text-center text-slate-700">Page {current} of {pages}</p>}
+        {pages > 1 && <p className="mt-3 text-center text-slate-700">{t('gal.pageOf', { n: current, total: pages })}</p>}
 
         <p className="mt-10 text-lg">
-          Have photos from a PNGA event to share? <Link to="/contact?topic=Photos" className="font-bold text-navy underline">Send them to us</Link>.
+          {t('gal.share')}<Link to="/contact?topic=Photos" className="font-bold text-navy underline">{t('gal.shareLink')}</Link>{t('gal.shareEnd')}
         </p>
       </div>
 

@@ -55,11 +55,11 @@ export const telHref = SITE.phone ? `tel:${SITE.phone.replace(/[^+\d]/g, '')}` :
 export const absoluteUrl = (path: string): string => (SITE.url ? `${SITE.url}${path}` : '');
 
 export const NAV_LINKS = [
-  { to: '/', label: 'Home' },
-  { to: '/programs', label: 'Programs' },
-  { to: '/events', label: 'Events' },
-  { to: '/news', label: 'News' },
-  { to: '/about', label: 'About' },
-  { to: '/get-involved', label: 'Get Involved' },
-  { to: '/contact', label: 'Contact' },
+  { to: '/', label: 'Home', key: 'nav.home' },
+  { to: '/programs', label: 'Programs', key: 'nav.programs' },
+  { to: '/events', label: 'Events', key: 'nav.events' },
+  { to: '/news', label: 'News', key: 'nav.news' },
+  { to: '/about', label: 'About', key: 'nav.about' },
+  { to: '/get-involved', label: 'Get Involved', key: 'nav.involved' },
+  { to: '/contact', label: 'Contact', key: 'nav.contact' },
 ] as const;

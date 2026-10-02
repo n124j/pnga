@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useI18n } from '../lib/i18n';
+import { categoryLabel } from '../lib/dates';
 import Seo, { breadcrumbJsonLd } from '../components/Seo';
 import PageHeader from '../components/PageHeader';
 import NewsCard from '../components/NewsCard';
@@ -8,6 +9,7 @@ import FacebookGroupCard from '../components/FacebookGroupCard';
 import { useNews } from '../lib/sheets';
 
 export default function News() {
+  const { lang, t } = useI18n();
   const items = useNews();
   const [category, setCategory] = useState('All');
   const categories = ['All', ...Array.from(new Set(items.map((i) => i.category).filter(Boolean)))];
@@ -17,14 +19,14 @@ export default function News() {
     <>
       <Seo
         path="/news"
-        title="News and Announcements"
-        description="News, announcements and updates from the Pennsylvania Nepalese Guthi Association."
-        jsonLd={[breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'News', path: '/news' }])]}
+        title={t('news.seoTitle')}
+        description={t('news.seoDesc')}
+        jsonLd={[breadcrumbJsonLd([{ name: t('crumb.home'), path: '/' }, { name: t('nav.news'), path: '/news' }], lang)]}
       />
-      <PageHeader title="News" crumbs={[{ label: 'News' }]} intro="Announcements and updates from our community." />
+      <PageHeader title={t('news.h1')} crumbs={[{ label: t('nav.news') }]} intro={t('news.intro')} />
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         {categories.length > 2 && (
-          <div role="group" aria-label="Filter by topic" className="mb-8 flex flex-wrap gap-2">
+          <div role="group" aria-label={t('news.filter')} className="mb-8 flex flex-wrap gap-2">
             {categories.map((c) => (
               <button
                 key={c}
@@ -35,7 +37,7 @@ export default function News() {
                   c === category ? 'border-navy bg-navy text-white' : 'border-navy bg-white text-navy hover:bg-slate-100'
                 }`}
               >
-                {c}
+                {c === 'All' ? t('category.all') : categoryLabel(lang, c)}
               </button>
             ))}
           </div>
@@ -46,7 +48,7 @@ export default function News() {
           </ul>
         ) : (
           <p className="rounded-2xl border border-slate-200 bg-white p-8 text-xl">
-            No news has been posted yet. Please check back soon, or see our <Link to="/events" className="font-bold text-navy underline">events</Link>.
+            {t('news.empty1')}<Link to="/events" className="font-bold text-navy underline">{t('news.emptyLink')}</Link>{t('news.empty2')}
           </p>
         )}
         <div className="mt-12 grid gap-6 lg:grid-cols-2">

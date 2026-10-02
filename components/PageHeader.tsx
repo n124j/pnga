@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useI18n } from '../lib/i18n';
 import { ChevronRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 
@@ -9,13 +9,14 @@ interface Props {
 }
 
 export default function PageHeader({ title, intro, crumbs }: Props) {
+  const { t } = useI18n();
   return (
     <div className="border-b border-slate-200 bg-white">
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 md:py-14">
         {crumbs && (
-          <nav aria-label="Breadcrumb" className="mb-4 text-sm">
+          <nav aria-label={t('crumb.nav')} className="mb-4 text-sm">
             <ol className="flex flex-wrap items-center gap-1 text-slate-700">
-              <li><Link to="/" className="underline">Home</Link></li>
+              <li><Link to="/" className="underline">{t('crumb.home')}</Link></li>
               {crumbs.map((c) => (
                 <li key={c.label} className="flex items-center gap-1">
                   <ChevronRight size={14} aria-hidden="true" />

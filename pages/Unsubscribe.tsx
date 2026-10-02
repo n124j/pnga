@@ -4,8 +4,10 @@ import Seo from '../components/Seo';
 import PageHeader from '../components/PageHeader';
 import { unsubscribeNewsletter, unsubscribeWithToken, type SendResult } from '../lib/forms';
 import { SITE } from '../lib/site';
+import { useI18n } from '../lib/i18n';
 
 export default function Unsubscribe() {
+  const { t: tr } = useI18n();
   const [status, setStatus] = useState<'idle' | 'sending' | SendResult>('idle');
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
@@ -27,7 +29,7 @@ export default function Unsubscribe() {
     if (data.get('website')) return; // spam trap
     const email = String(data.get('email') ?? '').trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please type a full email address, like name@example.com.');
+      setError(tr('nl.emailError'));
       return;
     }
     setError('');
@@ -38,31 +40,31 @@ export default function Unsubscribe() {
   const busy = status === 'sending';
   return (
     <>
-      <Seo path="/unsubscribe" title="Unsubscribe from the newsletter" noindex />
+      <Seo path="/unsubscribe" title={tr('un.seoTitle')} noindex />
       <PageHeader
-        title="Unsubscribe"
-        crumbs={[{ label: 'Unsubscribe' }]}
-        intro="Sorry to see you go. Every newsletter also has a personal unsubscribe link at the bottom."
+        title={tr('un.h1')}
+        crumbs={[{ label: tr('un.h1') }]}
+        intro={tr('un.intro')}
       />
       <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
         {token ? (
           <div className="space-y-4">
-            <p className="text-lg">Please confirm that you no longer want to receive the PNGA newsletter.</p>
+            <p className="text-lg">{tr('un.confirm')}</p>
             <button type="button" onClick={confirmToken} disabled={busy || status === 'sent'} className="btn btn-primary w-full sm:w-auto disabled:opacity-60">
               {busy ? <Loader2 size={20} className="animate-spin" aria-hidden="true" /> : <MailX size={20} aria-hidden="true" />}
-              {busy ? 'Working…' : 'Yes, unsubscribe me'}
+              {busy ? tr('un.working') : tr('un.yes')}
             </button>
             <div aria-live="polite">
               {status === 'sent' && (
                 <p className="flex items-start gap-2 rounded-xl bg-green-50 p-4 font-semibold text-green-900">
                   <CheckCircle2 size={22} className="mt-0.5 shrink-0" aria-hidden="true" />
-                  Done. You have been unsubscribed and will not get more newsletters.
+                  {tr('un.done')}
                 </p>
               )}
               {(status === 'error' || status === 'not-configured') && (
                 <p className="flex items-start gap-2 rounded-xl bg-red-50 p-4 font-semibold text-red-900">
                   <AlertCircle size={22} className="mt-0.5 shrink-0" aria-hidden="true" />
-                  <span>Sorry, that did not go through.{SITE.email ? <> Please email <a className="underline" href={`mailto:${SITE.email}`}>{SITE.email}</a> and we will remove you.</> : ' Please try again later.'}</span>
+                  <span>{tr('un.sorry')}{SITE.email ? <>{tr('un.emailRemove1')}<a className="underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>{tr('un.emailRemove2')}</> : ' ' + tr('nl.later')}</span>
                 </p>
               )}
             </div>
@@ -71,7 +73,7 @@ export default function Unsubscribe() {
         <form onSubmit={onSubmit} noValidate className="space-y-4">
           <fieldset disabled={busy || status === 'sent'} className="space-y-4">
             <div>
-              <label htmlFor="unsub-email" className="field-label">Email address</label>
+              <label htmlFor="unsub-email" className="field-label">{tr('un.emailLabel')}</label>
               <input id="unsub-email" name="email" type="email" required autoComplete="email" inputMode="email" className="field" />
             </div>
             <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
@@ -85,21 +87,21 @@ export default function Unsubscribe() {
           )}
           <button type="submit" disabled={busy || status === 'sent'} className="btn btn-primary w-full sm:w-auto disabled:opacity-60">
             {busy ? <Loader2 size={20} className="animate-spin" aria-hidden="true" /> : <MailX size={20} aria-hidden="true" />}
-            {busy ? 'Working…' : 'Send me the link'}
+            {busy ? tr('un.working') : tr('un.send')}
           </button>
           <div aria-live="polite">
             {status === 'sent' && (
               <p className="flex items-start gap-2 rounded-xl bg-green-50 p-4 font-semibold text-green-900">
                 <CheckCircle2 size={22} className="mt-0.5 shrink-0" aria-hidden="true" />
-                If that address is on our list, we have just emailed it a link. Please open that email and click the link to finish unsubscribing. Check your spam folder if you do not see it.
+                {tr('un.linkSent')}
               </p>
             )}
             {(status === 'error' || status === 'not-configured') && (
               <p className="flex items-start gap-2 rounded-xl bg-red-50 p-4 font-semibold text-red-900">
                 <AlertCircle size={22} className="mt-0.5 shrink-0" aria-hidden="true" />
                 <span>
-                  Sorry, that did not go through.{' '}
-                  {SITE.email ? <>Please email <a className="underline" href={`mailto:${SITE.email}`}>{SITE.email}</a> and we will remove you.</> : 'Please try again later.'}
+                  {tr('un.sorry')}{' '}
+                  {SITE.email ? <>{tr('un.emailRemove1').trim()} <a className="underline" href={`mailto:${SITE.email}`}>{SITE.email}</a>{tr('un.emailRemove2')}</> : tr('nl.later')}
                 </span>
               </p>
             )}

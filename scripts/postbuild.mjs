@@ -62,7 +62,30 @@ const siteUrl = (env.VITE_SITE_URL || '').trim().replace(/\/+$/, '');
 // Static hosts (Cloudflare Pages, Netlify) show /404.html for unknown addresses.
 if (existsSync(join(dist, '404', 'index.html'))) copyFileSync(join(dist, '404', 'index.html'), join(dist, '404.html'));
 console.log(`[postbuild] moved ${externalizeInlineScripts(dist)} inline scripts into /_inline files`);
-const pages = findPages(dist).filter((p) => p !== '/404').sort();
+// Nepali pages (under /ne) must say lang="ne" so screen readers and browsers pick the right voice and font.
+function markNepaliPages(dir) {
+  let count = 0;
+  const walk = (d) => {
+    for (const name of readdirSync(d)) {
+      const full = join(d, name);
+      if (statSync(full).isDirectory()) { walk(full); continue; }
+      if (!name.endsWith('.html')) continue;
+      const html = readFileSync(full, 'utf8');
+      const out = html.replace(/<html([^>]*?)\blang="en"/, '<html$1lang="ne"');
+      if (out !== html) { writeFileSync(full, out); count++; }
+    }
+  };
+  if (existsSync(dir)) walk(dir);
+  return count;
+}
+console.log(`[postbuild] set lang="ne" on ${markNepaliPages(join(dist, 'ne'))} Nepali pages`);
+
+// Pages that ask search engines to stay away (404 pages, Nepali pages that are still English) are left out of the sitemap.
+const isHidden = (p) => {
+  const file = join(dist, p === '/' ? '' : p, 'index.html');
+  return existsSync(file) && /<meta[^>]+name="robots"[^>]+noindex/i.test(readFileSync(file, 'utf8'));
+};
+const pages = findPages(dist).filter((p) => p !== '/404' && !isHidden(p)).sort();
 
 if (!siteUrl) {
   console.warn(

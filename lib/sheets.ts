@@ -7,6 +7,8 @@ import { BIOS } from '../data/boardBios';
 import snapshot from '../data/generated/snapshot.json';
 import { GALLERY_IMAGES, type GalleryImage } from '../data/gallery';
 import { HERO_SLIDES, type HeroSlide } from '../data/hero';
+import { formatDay } from './dates';
+import type { Lang } from './i18n';
 import { EVENTS, type CommunityEvent } from '../data/events';
 import { PROGRAMS, type Program, type ProgramSection } from '../data/programs';
 import {
@@ -85,6 +87,10 @@ export interface NewsItem {
   image: string;
   category: string;
   link: string;
+  /** Optional Nepali text from the "... (Nepali)" columns. Empty means "show the English". */
+  titleNe: string;
+  summaryNe: string;
+  contentNe: string;
 }
 
 function isoDate(v: string): string {
@@ -112,22 +118,27 @@ export function parseNews(csv: string): NewsItem[] {
       image: driveImageUrl(o.image ?? ''),
       category: o.category ?? '',
       link: httpsOnly(o.link ?? ''),
+      titleNe: o['title (nepali)'] ?? '',
+      summaryNe: o['summary (nepali)'] ?? '',
+      contentNe: o['content (nepali)'] ?? '',
     }))
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function formatNewsDate(iso: string): string {
+export function formatNewsDate(iso: string, lang: Lang = 'en'): string {
   if (!iso) return '';
   const d = new Date(`${iso}T12:00:00`);
-  return Number.isNaN(d.getTime())
-    ? ''
-    : d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  return Number.isNaN(d.getTime()) ? '' : formatDay(lang, d.getFullYear(), d.getMonth() + 1, d.getDate(), false);
 }
 
 /* ---------- Gallery ---------- */
 
 export interface SheetPhoto extends GalleryImage {
   album: string;
+  /** Optional Nepali text from the "Caption (Nepali)" and "Album (Nepali)" columns. */
+  captionNe?: string;
+  albumNe?: string;
+  altNe?: string;
 }
 
 export function parseGallery(csv: string): SheetPhoto[] {
@@ -138,6 +149,9 @@ export function parseGallery(csv: string): SheetPhoto[] {
       alt: o.caption || 'PNGA community photo',
       caption: o.caption ?? '',
       album: o.album ?? '',
+      captionNe: o['caption (nepali)'] || undefined,
+      altNe: o['caption (nepali)'] || undefined,
+      albumNe: o['album (nepali)'] || undefined,
     }))
     .filter((p) => p.src);
 }
@@ -155,13 +169,14 @@ export function parseHero(csv: string): HeroSlide[] {
       i,
       src: driveImageUrl(o.photo ?? o['photo link'] ?? ''),
       alt: (o.description ?? o.caption ?? '').trim() || 'Photo from the PNGA community',
+      altNe: (o['description (nepali)'] ?? o['caption (nepali)'] ?? '').trim() || undefined,
       order: Number.parseFloat(o.order ?? ''),
       show: !/^(no|n|false|hide|hidden|0)$/i.test((o.show ?? o.published ?? '').trim()),
     }))
     .filter((r) => r.show && r.src)
     .sort((a, b) => (Number.isNaN(a.order) ? 1e9 : a.order) - (Number.isNaN(b.order) ? 1e9 : b.order) || a.i - b.i)
     .filter((r) => (seen.has(r.src) ? false : (seen.add(r.src), true)))
-    .map(({ src, alt }) => ({ src, alt }));
+    .map(({ src, alt, altNe }) => ({ src, alt, ...(altNe ? { altNe } : {}) }));
 }
 
 /* ---------- Events ---------- */
@@ -197,6 +212,9 @@ export function parseEvents(csv: string): CommunityEvent[] {
       location: o.location ?? '',
       address: o.address || undefined,
       description: o.description ?? '',
+      titleNe: o['title (nepali)'] || undefined,
+      locationNe: o['location (nepali)'] || undefined,
+      descriptionNe: o['description (nepali)'] || undefined,
       category: o.category || 'Community',
       registrationUrl: httpsOnly(o['registration link'] ?? '') || undefined,
     }))
@@ -207,6 +225,8 @@ export function parseEvents(csv: string): CommunityEvent[] {
 
 export interface BoardSection {
   title: string;
+  /** Optional Nepali group name (from the "Group (Nepali)" column). */
+  titleNe?: string;
   /** Group is shown under "Past boards" (its name contains past, earlier or former). */
   past: boolean;
   people: BoardPerson[];
@@ -215,6 +235,10 @@ export interface BoardSection {
 export interface BoardPerson {
   role: string;
   name: string;
+  /** Optional Nepali versions (from the "Role (Nepali)", "Name (Nepali)" and "Bio (Nepali)" columns). */
+  roleNe?: string;
+  nameNe?: string;
+  bioNe?: string;
   /** Short biography, paragraphs separated by line breaks. */
   bio?: string;
   /** Picture address (Google Drive link or /images path already converted for display). */
@@ -239,8 +263,9 @@ export function parseBoard(csv: string): BoardSection[] {
       sec = { title, past: /\b(past|earlier|former|previous)\b/i.test(title), people: [] };
       sections.push(sec);
     }
+    if (!sec.titleNe && o['group (nepali)']) sec.titleNe = o['group (nepali)'].trim();
     // A Bio typed in the sheet wins; if the cell is empty, the built-in bio for that name is used so links never vanish.
-    sec.people.push({ role: (o.role ?? '').trim(), name, bio: (o.bio ?? '').trim() || BIO_BY_KEY.get(nameKey(name)) || undefined, photo: driveImageUrl(o.photo ?? '') || undefined });
+    sec.people.push({ role: (o.role ?? '').trim(), name, bio: (o.bio ?? '').trim() || BIO_BY_KEY.get(nameKey(name)) || undefined, photo: driveImageUrl(o.photo ?? '') || undefined, roleNe: (o['role (nepali)'] ?? '').trim() || undefined, nameNe: (o['name (nepali)'] ?? '').trim() || undefined, bioNe: (o['bio (nepali)'] ?? '').trim() || undefined });
   }
   return sections;
 }
@@ -284,6 +309,9 @@ export function parsePrograms(csv: string): Program[] {
     if (addr && p.id === slug(title)) p.id = addr;
     if (!p.summary && o.summary) p.summary = o.summary.trim();
     if (!p.intro && o.intro) p.intro = o.intro.trim();
+    if (!p.titleNe && o['program (nepali)']) p.titleNe = o['program (nepali)'].trim();
+    if (!p.summaryNe && o['summary (nepali)']) p.summaryNe = o['summary (nepali)'].trim();
+    if (!p.introNe && o['intro (nepali)']) p.introNe = o['intro (nepali)'].trim();
     const icon = ICON_NAMES.find((n) => n.toLowerCase() === (o.icon ?? '').trim().toLowerCase());
     if (icon && !iconSet.has(key)) { p.icon = icon; iconSet.add(key); }
     const item = (o.item ?? '').trim();
@@ -291,9 +319,14 @@ export function parsePrograms(csv: string): Program[] {
       const heading = (o.section ?? '').trim() || 'What this includes';
       let sec = secs.get(heading.toLowerCase());
       if (!sec) { sec = { heading, items: [] }; secs.set(heading.toLowerCase(), sec); p.sections.push(sec); }
+      const headingNe = (o['section (nepali)'] ?? '').trim();
+      if (headingNe && !sec.headingNe) sec.headingNe = headingNe;
       sec.items.push(item);
+      (sec.itemsNe ??= [])[sec.items.length - 1] = (o['item (nepali)'] ?? '').trim();
       const note = (o.description ?? '').trim();
       if (note) (sec.notes ??= {})[item] = note;
+      const noteNe = (o['description (nepali)'] ?? '').trim();
+      if (noteNe) (sec.notesNe ??= {})[item] = noteNe;
     }
   }
   return [...byTitle.values()].map(({ p }) => p).filter((p) => p.sections.length > 0);

@@ -7,8 +7,8 @@
   --color-navy-dark: #002a6e;
   --color-gold: #ffd700;
   --color-sky: #a9c9ff;
-  --font-sans: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-serif: "Karma", Georgia, "Times New Roman", serif;
+  --font-sans: "Montserrat", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Karma", "Noto Sans Devanagari", Georgia, "Times New Roman", serif;
 }
 
 @layer base {
@@ -35,6 +35,9 @@
     border-radius: 4px;
   }
   main:focus { outline: none; }
+  /* Devanagari has tall marks above and below the line, so give Nepali text more room. */
+  :lang(ne) body, body:lang(ne), :lang(ne) { line-height: 1.8; }
+  :lang(ne) h1, :lang(ne) h2, :lang(ne) h3 { line-height: 1.4; letter-spacing: 0; }
 }
 
 @layer components {
