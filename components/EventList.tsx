@@ -7,7 +7,7 @@ import { directionsUrl, formatEventDate, googleCalendarUrl, icsHref } from '../l
 function EventCard({ event }: { event: CommunityEvent }) {
   return (
     <li className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <p className="text-sm font-bold uppercase tracking-wide text-crimson-dark">{event.category}</p>
+      <p className="text-sm font-bold uppercase tracking-wide text-gold-dark">{event.category}</p>
       <h3 className="mt-1 text-2xl font-bold text-navy">{event.title}</h3>
       <p className="mt-2 font-semibold">{formatEventDate(event)}</p>
       <p className="mt-1 flex items-start gap-2 text-slate-700">

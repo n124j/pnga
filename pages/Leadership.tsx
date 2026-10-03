@@ -73,7 +73,7 @@ function Name({ name, bios, onOpen }: { name: string; bios: Map<string, BoardPer
     <button
       type="button"
       onClick={() => onOpen(person)}
-      className="cursor-pointer py-1 text-left font-semibold text-navy underline decoration-2 underline-offset-2 hover:text-crimson-dark"
+      className="cursor-pointer py-1 text-left font-semibold text-navy underline decoration-2 underline-offset-2 hover:text-gold-dark"
     >
       {name}
       <span className="sr-only">, read bio</span>

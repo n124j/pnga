@@ -10,7 +10,7 @@ export default function NewsCard({ item, compact = false }: { item: NewsItem; co
         <img src={item.image} alt="" loading="lazy" className="aspect-[16/9] w-full object-cover" />
       )}
       <div className="flex flex-1 flex-col p-6">
-        <p className="text-sm font-bold uppercase tracking-wide text-crimson-dark">
+        <p className="text-sm font-bold uppercase tracking-wide text-gold-dark">
           {[item.category, date].filter(Boolean).join(' · ')}
         </p>
         <h3 className="mt-1 text-2xl font-bold text-navy">{item.title}</h3>

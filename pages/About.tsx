@@ -52,7 +52,7 @@ export default function About() {
 
         <ul className="grid gap-6 md:grid-cols-3">
           <li className="rounded-2xl border border-slate-200 bg-white p-6">
-            <Eye size={32} className="text-crimson-dark" aria-hidden="true" />
+            <Eye size={32} className="text-gold-dark" aria-hidden="true" />
             <h2 className="mt-3 text-2xl font-bold text-navy">Our vision</h2>
             <p className="mt-2 text-slate-800">
               A fair and just Pennsylvania where all residents, irrespective of race, ethnicity and gender, live with

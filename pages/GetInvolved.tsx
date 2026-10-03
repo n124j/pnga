@@ -21,7 +21,7 @@ export default function GetInvolved() {
       />
       <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2">
         <section className="rounded-2xl border border-slate-200 bg-white p-7" aria-labelledby="volunteer">
-          <HandHeart size={36} className="text-crimson-dark" aria-hidden="true" />
+          <HandHeart size={36} className="text-gold-dark" aria-hidden="true" />
           <h2 id="volunteer" className="mt-3 text-3xl font-bold text-navy">Volunteer</h2>
           <p className="mt-3 text-lg text-slate-700">You can help with:</p>
           <ul className="mt-2 list-disc space-y-1 pl-6 text-lg">
