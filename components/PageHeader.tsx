@@ -26,7 +26,7 @@ export default function PageHeader({ title, intro, crumbs }: Props) {
           </nav>
         )}
         <h1 className="text-4xl font-bold text-navy md:text-5xl">{title}</h1>
-        <div className="mt-4 h-1.5 w-20 rounded-full bg-crimson" aria-hidden="true" />
+        <div className="mt-4 h-1.5 w-20 rounded-full bg-gold" aria-hidden="true" />
         {intro && <div className="mt-6 text-xl text-slate-700">{intro}</div>}
       </div>
     </div>

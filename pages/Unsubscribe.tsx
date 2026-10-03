@@ -79,7 +79,7 @@ export default function Unsubscribe() {
             </div>
           </fieldset>
           {error && (
-            <p role="alert" className="flex items-start gap-2 font-semibold text-crimson-dark">
+            <p role="alert" className="flex items-start gap-2 font-semibold text-red-700">
               <AlertCircle size={22} className="mt-0.5 shrink-0" aria-hidden="true" /> {error}
             </p>
           )}

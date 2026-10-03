@@ -45,7 +45,7 @@ export default function ProgramDetail() {
             <ul className="mt-4 grid gap-3">
               {section.items.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-lg">
-                  <CheckCircle2 size={24} className="mt-0.5 shrink-0 text-crimson-dark" aria-hidden="true" />
+                  <CheckCircle2 size={24} className="mt-0.5 shrink-0 text-gold-dark" aria-hidden="true" />
                   <span>
                     <span className="font-semibold">{item}</span>
                     {section.notes?.[item] && <span className="mt-1 block text-slate-700">{section.notes[item]}</span>}

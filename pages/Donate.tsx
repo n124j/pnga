@@ -51,7 +51,7 @@ export default function Donate() {
           </p>
         )}
 
-        <section className="rounded-2xl border-2 border-crimson bg-white p-7" aria-labelledby="ways">
+        <section className="rounded-2xl border-2 border-gold bg-white p-7" aria-labelledby="ways">
           <h2 id="ways" className="text-2xl font-bold text-navy">Check, Zelle or PayPal</h2>
           <div className="mt-4">
             <div className="space-y-6 text-lg">

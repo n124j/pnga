@@ -24,7 +24,7 @@ export default function Contact() {
       <div className="mx-auto grid max-w-5xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[2fr_3fr]">
         <div className="space-y-6 text-lg">
           <p className="flex gap-3">
-            <MapPin size={24} className="mt-1 shrink-0 text-crimson-dark" aria-hidden="true" />
+            <MapPin size={24} className="mt-1 shrink-0 text-gold-dark" aria-hidden="true" />
             <span>
               <span className="block font-bold">Mailing address</span>
               <a href={mapsUrl} className="underline" target="_blank" rel="noopener noreferrer">
@@ -34,13 +34,13 @@ export default function Contact() {
           </p>
           {SITE.phone && (
             <p className="flex gap-3">
-              <Phone size={24} className="mt-1 shrink-0 text-crimson-dark" aria-hidden="true" />
+              <Phone size={24} className="mt-1 shrink-0 text-gold-dark" aria-hidden="true" />
               <span><span className="block font-bold">Phone</span><a href={telHref} className="underline">{SITE.phone}</a></span>
             </p>
           )}
           {SITE.email && (
             <p className="flex gap-3">
-              <Mail size={24} className="mt-1 shrink-0 text-crimson-dark" aria-hidden="true" />
+              <Mail size={24} className="mt-1 shrink-0 text-gold-dark" aria-hidden="true" />
               <span><span className="block font-bold">Email</span><a href={`mailto:${SITE.email}`} className="underline">{SITE.email}</a></span>
             </p>
           )}

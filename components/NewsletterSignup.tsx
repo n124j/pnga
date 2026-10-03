@@ -67,7 +67,7 @@ export default function NewsletterSignup({ id = 'newsletter' }: { id?: string })
           email address. Every email has an unsubscribe option, or you can <a href="/unsubscribe" className="font-bold text-navy underline">unsubscribe here</a> at any time. See our <a href="/privacy" className="font-bold text-navy underline">privacy policy</a>.
         </p>
         {error && (
-          <p role="alert" className="flex items-start gap-2 font-semibold text-crimson-dark">
+          <p role="alert" className="flex items-start gap-2 font-semibold text-red-700">
             <AlertCircle size={22} className="mt-0.5 shrink-0" aria-hidden="true" /> {error}
           </p>
         )}

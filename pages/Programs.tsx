@@ -26,7 +26,7 @@ export default function Programs() {
                 </span>
                 <span className="text-2xl font-bold font-serif text-navy">{p.title}</span>
                 <span className="mt-2 flex-grow text-lg text-slate-700">{p.summary}</span>
-                <span className="mt-4 inline-flex items-center gap-1 font-bold text-crimson-dark">
+                <span className="mt-4 inline-flex items-center gap-1 font-bold text-gold-dark">
                   Read more <ArrowRight size={18} aria-hidden="true" />
                 </span>
               </Link>

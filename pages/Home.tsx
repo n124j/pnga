@@ -11,10 +11,10 @@ import HeroSlideshow from '../components/HeroSlideshow';
 import { SITE } from '../lib/site';
 
 const QUICK = [
-  { to: '/help', label: 'Get Help', text: 'Ask for support or find a trusted service', Icon: LifeBuoy, style: 'bg-crimson text-white hover:bg-crimson-dark' },
+  { to: '/help', label: 'Get Help', text: 'Ask for support or find a trusted service', Icon: LifeBuoy, style: 'bg-gold text-slate-900 hover:bg-gold-dark' },
   { to: '/events', label: 'Upcoming Events', text: 'Festivals, meetings and gatherings', Icon: Calendar, style: 'bg-navy text-white hover:bg-navy-dark' },
   { to: '/get-involved', label: 'Volunteer or Join', text: 'Give your time and skills', Icon: HandHeart, style: 'bg-white text-navy border-2 border-navy hover:bg-slate-100' },
-  { to: '/donate', label: 'Donate', text: 'Support families in our community', Icon: Heart, style: 'bg-white text-crimson-dark border-2 border-crimson hover:bg-slate-100' },
+  { to: '/donate', label: 'Donate', text: 'Support families in our community', Icon: Heart, style: 'bg-white text-gold-dark border-2 border-gold hover:bg-slate-100' },
 ];
 
 export default function Home() {
@@ -106,7 +106,7 @@ export default function Home() {
                   </span>
                   <span className="text-2xl font-bold font-serif text-navy">{p.title}</span>
                   <span className="mt-2 flex-grow text-slate-700">{p.summary}</span>
-                  <span className="mt-4 inline-flex items-center gap-1 font-bold text-crimson-dark">
+                  <span className="mt-4 inline-flex items-center gap-1 font-bold text-gold-dark">
                     Learn more <ArrowRight size={18} aria-hidden="true" />
                   </span>
                 </Link>
@@ -142,7 +142,7 @@ export default function Home() {
           </p>
           <Link to="/get-involved" className="btn btn-navy mt-6">Volunteer or join</Link>
         </div>
-        <div className="rounded-3xl bg-crimson p-8 text-white">
+        <div className="rounded-3xl bg-gold p-8 text-slate-900">
           <Heart size={36} aria-hidden="true" />
           <h2 className="mt-4 text-3xl font-bold">Support our work</h2>
           <p className="mt-3 text-lg">

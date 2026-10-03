@@ -23,8 +23,8 @@ export default function Help() {
       />
 
       <div className="mx-auto max-w-4xl space-y-10 px-4 py-10 sm:px-6">
-        <section aria-labelledby="emergency" className="rounded-2xl border-2 border-crimson bg-white p-6">
-          <h2 id="emergency" className="text-2xl font-bold text-crimson-dark">In an emergency, do not wait for a form</h2>
+        <section aria-labelledby="emergency" className="rounded-2xl border-2 border-red-700 bg-white p-6">
+          <h2 id="emergency" className="text-2xl font-bold text-red-700">In an emergency, do not wait for a form</h2>
           <ul className="mt-4 grid gap-3 sm:grid-cols-2">
             <li>
               <a href="tel:911" className="btn btn-primary w-full text-lg"><Phone size={20} aria-hidden="true" /> Call 911</a>
