@@ -3,9 +3,8 @@ import { Eye, ShieldCheck, Target } from 'lucide-react';
 import Seo, { breadcrumbJsonLd } from '../components/Seo';
 import PageHeader from '../components/PageHeader';
 import { GALLERY_IMAGES } from '../data/gallery';
-import { SITE } from '../lib/site';
+import { MISSION, SITE, VALUES, VISION } from '../lib/site';
 
-const VALUES = ['Conviction', 'Persistence and perseverance', 'Fortitude', 'Collaboration', 'Respect'];
 const SUPPORTERS = ['Montgomery County Recovery Office', 'Philip Jaisohn Memorial Foundation', 'Private contributors'];
 
 export default function About() {
@@ -54,19 +53,12 @@ export default function About() {
           <li className="rounded-2xl border border-slate-200 bg-white p-6">
             <Eye size={32} className="text-gold-dark" aria-hidden="true" />
             <h2 className="mt-3 text-2xl font-bold text-navy">Our vision</h2>
-            <p className="mt-2 text-slate-800">
-              A fair and just Pennsylvania where all residents, irrespective of race, ethnicity and gender, live with
-              dignity and have equal opportunities to prosper.
-            </p>
+            <p className="mt-2 text-slate-800">{VISION}</p>
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-6">
             <Target size={32} className="text-navy" aria-hidden="true" />
             <h2 className="mt-3 text-2xl font-bold text-navy">Our mission</h2>
-            <p className="mt-2 text-slate-800">
-              To improve the lives of low-income immigrant communities in Pennsylvania, especially Montgomery County,
-              through community empowerment, capacity building, civic engagement and advocacy while promoting cultural
-              harmony.
-            </p>
+            <p className="mt-2 text-slate-800">{MISSION}</p>
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-6">
             <ShieldCheck size={32} className="text-navy" aria-hidden="true" />

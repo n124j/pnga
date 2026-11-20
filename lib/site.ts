@@ -63,3 +63,9 @@ export const NAV_LINKS = [
   { to: '/get-involved', label: 'Get Involved' },
   { to: '/contact', label: 'Contact' },
 ] as const;
+
+export const VISION =
+  'A fair and just Pennsylvania where all residents, irrespective of race, ethnicity and gender, live with dignity and have equal opportunities to prosper.';
+export const MISSION =
+  'To improve the lives of low-income immigrant communities in Pennsylvania, especially Montgomery County, through community empowerment, capacity building, civic engagement and advocacy while promoting cultural harmony.';
+export const VALUES = ['Conviction', 'Persistence and perseverance', 'Fortitude', 'Collaboration', 'Respect'];
