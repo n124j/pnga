@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, HandHeart, Heart, LifeBuoy, Users } from 'lucide-react';
+import { ArrowRight, Calendar, Eye, HandHeart, Heart, LifeBuoy, ShieldCheck, Target, Users } from 'lucide-react';
 import Seo, { organizationJsonLd } from '../components/Seo';
 import EventList from '../components/EventList';
 import NewsCard from '../components/NewsCard';
@@ -8,7 +8,7 @@ import FacebookGroupCard from '../components/FacebookGroupCard';
 import { useHeroSlides, useNews, usePrograms } from '../lib/sheets';
 import ProgramIcon from '../components/ProgramIcon';
 import HeroSlideshow from '../components/HeroSlideshow';
-import { SITE } from '../lib/site';
+import { MISSION, SITE, VALUES, VISION } from '../lib/site';
 
 const QUICK = [
   { to: '/help', label: 'Get Help', text: 'Ask for support or find a trusted service', Icon: LifeBuoy, style: 'bg-gold text-slate-900 hover:bg-gold-dark' },
@@ -53,6 +53,37 @@ export default function Home() {
                 </Link>
               </li>
             ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Mission, vision and values (from About) */}
+      <section className="bg-white py-14" aria-labelledby="mission-title">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <h2 id="mission-title" className="text-3xl font-bold text-navy md:text-4xl">Our mission</h2>
+            <Link to="/about" className="inline-flex items-center gap-1 font-bold text-navy underline">
+              About PNGA <ArrowRight size={18} aria-hidden="true" />
+            </Link>
+          </div>
+          <ul className="grid gap-6 md:grid-cols-3">
+            <li className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <Target size={32} className="text-navy" aria-hidden="true" />
+              <h3 className="mt-3 text-2xl font-bold font-serif text-navy">Mission</h3>
+              <p className="mt-2 text-slate-800">{MISSION}</p>
+            </li>
+            <li className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <Eye size={32} className="text-gold-dark" aria-hidden="true" />
+              <h3 className="mt-3 text-2xl font-bold font-serif text-navy">Vision</h3>
+              <p className="mt-2 text-slate-800">{VISION}</p>
+            </li>
+            <li className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <ShieldCheck size={32} className="text-navy" aria-hidden="true" />
+              <h3 className="mt-3 text-2xl font-bold font-serif text-navy">Values</h3>
+              <ul className="mt-2 list-disc pl-5 text-slate-800">
+                {VALUES.map((v) => <li key={v}>{v}</li>)}
+              </ul>
+            </li>
           </ul>
         </div>
       </section>
